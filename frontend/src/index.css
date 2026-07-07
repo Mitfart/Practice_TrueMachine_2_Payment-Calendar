@@ -21,5 +21,8 @@
 
 * { box-sizing: border-box; }
 body { margin: 0; }
-button, input { font: inherit; }
-button { cursor: default; }
+button, input, select { font: inherit; }
+button, select, input[type="month"] { cursor: pointer; }
+input[type="email"], input[type="password"], input[type="number"], input:not([type]) { cursor: text; }
+button:disabled { cursor: not-allowed; }
+::selection { color: #071f36; background: var(--mint); }

@@ -1,3 +1,5 @@
+import { calculateCalendar } from './calendar'
+
 export type UserRole = 'initiator' | 'treasurer' | 'manager' | 'admin'
 export type PaymentStatus = 'draft' | 'approval' | 'approved' | 'in-register' | 'paid' | 'rejected'
 export type FlowType = 'income' | 'payment'
@@ -19,6 +21,7 @@ export type CashFlow = {
 }
 export type CalendarDay = { date: string; income: number; outcome: number; endBalance: number; hasGap: boolean; flows: CashFlow[] }
 export type PaymentRegister = { id: string; date: string; status: 'draft' | 'approved' | 'exported' | 'paid'; total: number; paymentIds: string[] }
+export type FlowDraft = Omit<CashFlow, 'id' | 'type' | 'amount'> & { type: FlowType; amount: number }
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://127.0.0.1:8000/api'
 const tokenKey = 'payment-calendar-token'
@@ -74,23 +77,10 @@ const api = async <T,>(path: string, init: RequestInit = {}) => {
 }
 const fallback = async <T,>(call: () => Promise<T>, data: T) => { try { return await call() } catch { backendOnline = false; return delay(data) } }
 const mapStatus = (status?: string): PaymentStatus => status === 'on_approval' ? 'approval' : status === 'in_registry' ? 'in-register' : (status as PaymentStatus) || 'draft'
-const toAccount = (row: any): Account => ({ id: String(row.id), name: row.name, currency: row.currency ?? 'RUB', openingBalance: Math.round((row.opening_balance_kopecks ?? 0) / 100) })
+const toAccount = (row: any): Account => ({ id: String(row.id), name: row.name, currency: row.currency ?? 'RUB', openingBalance: (row.opening_balance_kopecks ?? 0) / 100 })
 const toDirectory = (row: any): DirectoryItem => ({ id: String(row.id), name: row.name, type: row.type === 'income' ? 'income' : row.type === 'payment' ? 'payment' : undefined, details: row.inn ?? row.details ?? '' })
-const toPayment = (row: any): CashFlow => ({ id: String(row.id), type: 'payment', date: row.payment_date, accountId: String(row.account_id), counterpartyId: String(row.counterparty_id), categoryId: String(row.item_id), purpose: row.purpose ?? '', amount: Math.round(row.amount_kopecks / 100), status: mapStatus(row.status), priority: row.priority > 1 ? 'high' : 'normal' })
-const toIncome = (row: any): CashFlow => ({ id: `i-${row.id}`, type: 'income', date: row.income_date, accountId: String(row.account_id), counterpartyId: String(row.counterparty_id), categoryId: String(row.item_id), purpose: 'Плановое поступление', amount: Math.round(row.amount_kopecks / 100) })
-const datesBetween = (start: string, end: string) => { const dates: string[] = []; for (let d = new Date(`${start}T00:00:00`); d <= new Date(`${end}T00:00:00`); d.setDate(d.getDate() + 1)) dates.push(d.toISOString().slice(0, 10)); return dates }
-const computeCalendar = (start: string, end: string, accountId: string, sourceFlows = flows, sourceAccounts = accounts) => {
-  let balance = sourceAccounts.filter((a) => accountId === 'all' || a.id === accountId).reduce((sum, a) => sum + a.openingBalance, 0)
-  const scoped = sourceFlows.filter((f) => accountId === 'all' || f.accountId === accountId)
-  return datesBetween(start, end).map((date) => {
-    const dayFlows = scoped.filter((f) => f.date === date)
-    const income = dayFlows.filter((f) => f.type === 'income').reduce((sum, f) => sum + f.amount, 0)
-    const outcome = dayFlows.filter((f) => f.type === 'payment').reduce((sum, f) => sum + f.amount, 0)
-    balance += income - outcome
-    return { date, income, outcome, endBalance: balance, hasGap: balance < 0, flows: dayFlows }
-  })
-}
-
+const toPayment = (row: any): CashFlow => ({ id: String(row.id), type: 'payment', date: row.payment_date, accountId: String(row.account_id), counterpartyId: String(row.counterparty_id), categoryId: String(row.item_id), purpose: row.purpose ?? '', amount: row.amount_kopecks / 100, status: mapStatus(row.status), priority: row.priority > 1 ? 'high' : 'normal' })
+const toIncome = (row: any): CashFlow => ({ id: `i-${row.id}`, type: 'income', date: row.income_date, accountId: String(row.account_id), counterpartyId: String(row.counterparty_id), categoryId: String(row.item_id), purpose: 'Плановое поступление', amount: row.amount_kopecks / 100 })
 export const paymentCalendarApi = {
   apiBase: API_BASE,
   isBackendOnline: () => backendOnline,
@@ -100,6 +90,11 @@ export const paymentCalendarApi = {
     return { ...result.user, id: String(result.user.id), role: result.user.role ?? 'treasurer' }
   },
   logout: () => { localStorage.removeItem(tokenKey); backendOnline = false; return delay(true) },
+  restoreSession: async () => {
+    if (!token()) throw new Error('No token')
+    const user = await api<User>('/me')
+    return { ...user, id: String(user.id), role: user.role ?? 'treasurer' }
+  },
   getUsers: () => delay(users),
   getAccounts: () => fallback(async () => (await api<any[]>('/accounts')).map(toAccount), accounts),
   getCounterparties: () => fallback(async () => (await api<any[]>('/counterparties')).map(toDirectory), counterparties),
@@ -110,6 +105,26 @@ export const paymentCalendarApi = {
     flows = [...payments.map(toPayment), ...incomes.map(toIncome)]
     return flows
   }, flows),
+  createFlow: async (draft: FlowDraft) => {
+    const local = { ...draft, id: `${draft.type === 'income' ? 'i' : 'p'}-${Date.now()}` }
+    try {
+      if (!token()) throw new Error('Debug mode')
+      if (draft.type === 'income') {
+        const created = await api<any>('/incomes', { method: 'POST', body: JSON.stringify({ account_id: draft.accountId, counterparty_id: draft.counterpartyId, item_id: draft.categoryId, amount_kopecks: Math.round(draft.amount * 100), income_date: draft.date }) })
+        const flow = toIncome(created)
+        flows = [...flows, flow]
+        return flow
+      }
+      const created = await api<any>('/payments', { method: 'POST', body: JSON.stringify({ account_id: draft.accountId, counterparty_id: draft.counterpartyId, item_id: draft.categoryId, amount_kopecks: Math.round(draft.amount * 100), payment_date: draft.date, purpose: draft.purpose, priority: draft.priority === 'high' ? 2 : draft.priority === 'low' ? 0 : 1, status: draft.status ?? 'draft' }) })
+      const flow = toPayment(created)
+      flows = [...flows, flow]
+      return flow
+    } catch {
+      backendOnline = false
+      flows = [...flows, local]
+      return delay(local)
+    }
+  },
   moveFlow: async (id: string, date: string) => {
     if (id.startsWith('i-')) throw new Error('Only payments can be moved')
     if (!token()) {
@@ -126,5 +141,18 @@ export const paymentCalendarApi = {
     flows = flows.map((f) => f.id === id ? { ...f, status } : f)
     return flows.find((f) => f.id === id)
   }, (flows = flows.map((f) => f.id === id && f.type === 'payment' ? { ...f, status } : f)).find((f) => f.id === id)),
-  getCalendar: async (start = '2026-06-01', end = '2026-06-30', accountId = 'all') => computeCalendar(start, end, accountId, await paymentCalendarApi.getFlows(), await paymentCalendarApi.getAccounts()),
+  createRegistry: async (accountId: string, date: string) => {
+    try {
+      const registry = await api<any>('/registries', { method: 'POST', body: JSON.stringify({ account_id: accountId, registry_date: date }) })
+      flows = flows.map((f) => registry.payments?.some((p: any) => String(p.id) === f.id) ? { ...f, status: 'in-register' } : f)
+      return registry
+    } catch (error) {
+      backendOnline = false
+      const ids = flows.filter((f) => f.type === 'payment' && f.status === 'approved' && f.accountId === accountId && f.date === date).map((f) => f.id)
+      if (ids.length === 0) throw error instanceof Error ? error : new Error('Нет согласованных заявок на эту дату')
+      flows = flows.map((f) => ids.includes(f.id) ? { ...f, status: 'in-register' } : f)
+      return delay({ id: `reg-${date}-${accountId}`, date, status: 'draft', paymentIds: ids, total: flows.filter((f) => ids.includes(f.id)).reduce((sum, f) => sum + f.amount, 0) })
+    }
+  },
+  getCalendar: async (start = '2026-06-01', end = '2026-06-30', accountId = 'all') => calculateCalendar(await paymentCalendarApi.getFlows(), await paymentCalendarApi.getAccounts(), accountId, start, end),
 }
