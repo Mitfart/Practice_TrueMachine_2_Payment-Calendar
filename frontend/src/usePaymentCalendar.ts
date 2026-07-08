@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { calculateCalendar } from './calendar'
-import { shortDate } from './format'
+import { money, shortDate } from './format'
 import { type Account, type CalendarDay, type CashFlow, type DirectoryItem, type FlowDraft, type PaymentStatus, type User, paymentCalendarApi } from './apiFacade'
 
 export type Page = 'calendar' | 'requests' | 'receipts' | 'approvals' | 'register' | 'reports' | 'directories' | 'admin'
 export type LoginState = { email: string; password: string; error: string; loading: boolean }
+export type ApprovalLog = { paymentId: string; decision: PaymentStatus; comment: string; date: string }
 
 export const statusLabel: Record<PaymentStatus, string> = { draft: 'Черновик', approval: 'На согласовании', approved: 'Согласована', 'in-register': 'В реестре', paid: 'Оплачена', rejected: 'Отклонена' }
 export const roleLabel = { initiator: 'Инициатор', treasurer: 'Казначей', manager: 'Руководитель', admin: 'Администратор' } as const
@@ -15,13 +16,27 @@ const monthRange = (month: string) => {
   const [year, monthNumber] = month.split('-').map(Number)
   return { start: `${month}-01`, end: new Date(Date.UTC(year, monthNumber, 0)).toISOString().slice(0, 10) }
 }
+const weekRange = (month: string) => {
+  const start = `${month}-01`
+  const end = new Date(`${start}T00:00:00`)
+  end.setDate(end.getDate() + 6)
+  return { start, end: end.toISOString().slice(0, 10) }
+}
+const download = (name: string, text: string) => {
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  a.click()
+  URL.revokeObjectURL(url)
+}
 const movableStatuses: Array<PaymentStatus | undefined> = ['draft', 'approval', 'approved']
 
 const rolePages: Record<User['role'], Page[]> = {
-  initiator: ['calendar', 'requests', 'receipts'],
-  treasurer: ['calendar', 'requests', 'receipts', 'register', 'reports', 'directories'],
+  initiator: ['calendar'],
+  treasurer: ['calendar', 'register', 'reports', 'directories'],
   manager: ['calendar', 'approvals', 'register', 'reports'],
-  admin: ['calendar', 'requests', 'receipts', 'approvals', 'register', 'reports', 'directories', 'admin'],
+  admin: ['calendar', 'approvals', 'register', 'reports', 'directories', 'admin'],
 }
 
 type CalendarState = {
@@ -33,6 +48,18 @@ type CalendarState = {
   setPeriod: React.Dispatch<React.SetStateAction<string>>
   onlyGaps: boolean
   setOnlyGaps: React.Dispatch<React.SetStateAction<boolean>>
+  categoryId: string
+  setCategoryId: React.Dispatch<React.SetStateAction<string>>
+  counterpartyId: string
+  setCounterpartyId: React.Dispatch<React.SetStateAction<string>>
+  status: string
+  setStatus: React.Dispatch<React.SetStateAction<string>>
+  periodMode: 'week' | 'month' | 'custom'
+  setPeriodMode: React.Dispatch<React.SetStateAction<'week' | 'month' | 'custom'>>
+  customStart: string
+  setCustomStart: React.Dispatch<React.SetStateAction<string>>
+  customEnd: string
+  setCustomEnd: React.Dispatch<React.SetStateAction<string>>
   draggedId: string | null
   setDraggedId: React.Dispatch<React.SetStateAction<string | null>>
   dragPoint: { x: number; y: number }
@@ -58,15 +85,19 @@ type CalendarState = {
   monthEnd: number
   approvedPayments: CashFlow[]
   needsApproval: CashFlow[]
+  approvalLog: ApprovalLog[]
   draggedFlow?: CashFlow
   reload: () => void
   submitLogin: (event: React.FormEvent) => void
   autoLogin: (nextUser: User) => void
   logout: () => void
   movePayment: (date: string) => void
-  setPaymentStatus: (id: string, status: PaymentStatus) => void
+  setPaymentStatus: (id: string, status: PaymentStatus, comment?: string) => void
   createFlow: (draft: FlowDraft) => void
   createRegistry: (accountId: string, date: string) => void
+  markPaid: (ids: string[]) => void
+  exportRegistry: (flows: CashFlow[]) => void
+  exportReports: () => void
 }
 
 export function usePaymentCalendar(): CalendarState {
@@ -74,6 +105,12 @@ export function usePaymentCalendar(): CalendarState {
   const [accountId, setAccountId] = useState('all')
   const [period, setPeriod] = useState('2026-06')
   const [onlyGaps, setOnlyGaps] = useState(false)
+  const [categoryId, setCategoryId] = useState('all')
+  const [counterpartyId, setCounterpartyId] = useState('all')
+  const [status, setStatus] = useState('all')
+  const [periodMode, setPeriodMode] = useState<'week' | 'month' | 'custom'>('month')
+  const [customStart, setCustomStart] = useState('2026-06-01')
+  const [customEnd, setCustomEnd] = useState('2026-06-30')
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [dragPoint, setDragPoint] = useState({ x: 0, y: 0 })
   const [user, setUser] = useState<User | null>(null)
@@ -86,11 +123,15 @@ export function usePaymentCalendar(): CalendarState {
   const [days, setDays] = useState<CalendarDay[]>([])
   const [selectedDay, setSelectedDay] = useState<CalendarDay | null>(null)
   const [message, setMessage] = useState('')
+  const [approvalLog, setApprovalLog] = useState<ApprovalLog[]>([])
 
   const availablePages = useMemo(() => user ? rolePages[user.role] : [], [user])
   const payments = useMemo(() => flows.filter((flow) => flow.type === 'payment'), [flows])
   const receipts = useMemo(() => flows.filter((flow) => flow.type === 'income'), [flows])
-  const visibleDays = useMemo(() => onlyGaps ? days.filter((day) => day.hasGap) : days, [days, onlyGaps])
+  const visibleDays = useMemo(() => {
+    const filtered = days.map((day) => ({ ...day, flows: day.flows.filter((flow) => (categoryId === 'all' || flow.categoryId === categoryId) && (counterpartyId === 'all' || flow.counterpartyId === counterpartyId) && (status === 'all' || flow.status === status)) }))
+    return onlyGaps ? filtered.filter((day) => day.hasGap) : filtered
+  }, [categoryId, counterpartyId, days, onlyGaps, status])
   const nearestGap = days.find((day) => day.hasGap)
   const monthEnd = days.at(-1)?.endBalance ?? 0
   const approvedPayments = useMemo(() => payments.filter((flow) => flow.status === 'approved'), [payments])
@@ -108,12 +149,12 @@ export function usePaymentCalendar(): CalendarState {
       setAccounts(nextAccounts)
       setCounterparties(nextCounterparties)
       setCategories(nextCategories)
-      const { start, end } = monthRange(period)
+      const { start, end } = periodMode === 'week' ? weekRange(period) : periodMode === 'custom' ? { start: customStart, end: customEnd } : monthRange(period)
       setUsers(nextUsers)
       setFlows(nextFlows)
       setDays(calculateCalendar(nextFlows, nextAccounts, accountId, start, end))
     })
-  }, [accountId, period])
+  }, [accountId, customEnd, customStart, period, periodMode])
 
   useEffect(() => {
     paymentCalendarApi.getUsers().then(setUsers)
@@ -141,7 +182,7 @@ export function usePaymentCalendar(): CalendarState {
   const movePayment = (date: string) => {
     const dragged = flows.find((flow) => flow.id === draggedId)
     if (!dragged || dragged.type !== 'payment' || !movableStatuses.includes(dragged.status)) return
-    const { start, end } = monthRange(period)
+    const { start, end } = periodMode === 'week' ? weekRange(period) : periodMode === 'custom' ? { start: customStart, end: customEnd } : monthRange(period)
     const previousFlows = flows
     const nextFlows = flows.map((flow) => flow.id === dragged.id && flow.type === 'payment' ? { ...flow, date } : flow)
     const nextDays = calculateCalendar(nextFlows, accounts, accountId, start, end)
@@ -154,11 +195,14 @@ export function usePaymentCalendar(): CalendarState {
       .catch(() => { setFlows(previousFlows); setDays(calculateCalendar(previousFlows, accounts, accountId, start, end)); setMessage('Не удалось перенести платёж. Изменение отменено.') })
   }
 
-  const setPaymentStatus = (id: string, status: PaymentStatus) => paymentCalendarApi.setStatus(id, status).then(() => { setMessage(`Статус: ${statusLabel[status]}`); reload() })
+  const setPaymentStatus = (id: string, nextStatus: PaymentStatus, comment = '') => paymentCalendarApi.setStatus(id, nextStatus, comment).then(() => { setApprovalLog((log) => nextStatus === 'approved' || nextStatus === 'rejected' ? [{ paymentId: id, decision: nextStatus, comment, date: new Date().toLocaleString('ru-RU') }, ...log] : log); setMessage(`Статус: ${statusLabel[nextStatus]}`); reload() })
   const createFlow = (draft: FlowDraft) => paymentCalendarApi.createFlow(draft).then(() => { setMessage(draft.type === 'income' ? 'Поступление создано' : 'Заявка создана'); reload() }).catch(() => setMessage('Не удалось создать движение'))
   const createRegistry = (registryAccountId: string, date: string) => paymentCalendarApi.createRegistry(registryAccountId, date).then(() => { setMessage('Реестр сформирован'); reload() }).catch((error) => setMessage(error instanceof Error ? error.message : 'Не удалось сформировать реестр'))
+  const markPaid = (ids: string[]) => Promise.all(ids.map((id) => paymentCalendarApi.setStatus(id, 'paid', 'Оплачено из реестра'))).then(() => { setMessage('Оплата отмечена'); reload() })
+  const exportRegistry = (rows: CashFlow[]) => download(`registry-${new Date().toISOString().slice(0, 10)}.csv`, ['Дата;Контрагент;Сумма;Назначение', ...rows.map((f) => `${f.date};${f.counterpartyId};${money(f.amount)};${f.purpose}`)].join('\n'))
+  const exportReports = () => download(`reports-${period}.csv`, ['Дата;Приход;Расход;Остаток;Разрыв', ...days.map((d) => `${d.date};${money(d.income)};${money(d.outcome)};${money(d.endBalance)};${d.hasGap ? 'да' : 'нет'}`)].join('\n'))
   const autoLogin = (nextUser: User) => { setUser(nextUser); setMessage(`Вход выполнен: ${nextUser.name}`) }
   const logout = () => { paymentCalendarApi.logout(); setUser(null); setFlows([]); setDays([]) }
 
-  return { page, setPage, accountId, setAccountId, period, setPeriod, onlyGaps, setOnlyGaps, draggedId, setDraggedId, dragPoint, setDragPoint, user, login, setLogin, users, accounts, counterparties, categories, flows, days, selectedDay, setSelectedDay, message, setMessage, availablePages, payments, receipts, visibleDays, nearestGap, monthEnd, approvedPayments, needsApproval, draggedFlow, reload, submitLogin, autoLogin, logout, movePayment, setPaymentStatus, createFlow, createRegistry }
+  return { page, setPage, accountId, setAccountId, period, setPeriod, onlyGaps, setOnlyGaps, categoryId, setCategoryId, counterpartyId, setCounterpartyId, status, setStatus, periodMode, setPeriodMode, customStart, setCustomStart, customEnd, setCustomEnd, draggedId, setDraggedId, dragPoint, setDragPoint, user, login, setLogin, users, accounts, counterparties, categories, flows, days, selectedDay, setSelectedDay, message, setMessage, availablePages, payments, receipts, visibleDays, nearestGap, monthEnd, approvedPayments, needsApproval, approvalLog, draggedFlow, reload, submitLogin, autoLogin, logout, movePayment, setPaymentStatus, createFlow, createRegistry, markPaid, exportRegistry, exportReports }
 }

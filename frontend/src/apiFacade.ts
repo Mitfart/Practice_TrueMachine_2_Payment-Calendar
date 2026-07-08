@@ -135,9 +135,9 @@ export const paymentCalendarApi = {
     flows = flows.map((f) => f.id === id ? toPayment(updated) : f)
     return toPayment(updated)
   },
-  setStatus: (id: string, status: PaymentStatus) => fallback(async () => {
+  setStatus: (id: string, status: PaymentStatus, comment = 'Frontend action') => fallback(async () => {
     if (status === 'approval') await api(`/payments/${id}/submit`, { method: 'POST' })
-    else await api(`/payments/${id}/decide`, { method: 'POST', body: JSON.stringify({ decision: status, comment: 'Frontend action' }) })
+    else await api(`/payments/${id}/decide`, { method: 'POST', body: JSON.stringify({ decision: status, comment }) })
     flows = flows.map((f) => f.id === id ? { ...f, status } : f)
     return flows.find((f) => f.id === id)
   }, (flows = flows.map((f) => f.id === id && f.type === 'payment' ? { ...f, status } : f)).find((f) => f.id === id)),

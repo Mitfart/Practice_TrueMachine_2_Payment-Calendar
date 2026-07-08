@@ -27,7 +27,11 @@ p { color: var(--slate); }
 .kpis > div { padding: 12px; }
 .kpis span, label, small { display: block; color: var(--muted); font-size: 12px; font-weight: 850; }
 .kpis strong { display: block; margin-top: 5px; font-size: 22px; font-variant-numeric: tabular-nums; }
-.controls { display: grid; grid-template-columns: 1fr 220px auto; align-items: end; gap: 10px; padding: 10px; margin-bottom: 10px; }
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); align-items: end; gap: 10px; padding: 10px; margin-bottom: 10px; }
+.accountSummary { margin-bottom: 12px; }
+.filterPopup { position: relative; }
+.filterMenu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; display: none; min-width: 280px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: var(--shadow); }
+.filterPopup:hover .filterMenu, .filterPopup:focus-within .filterMenu { display: grid; gap: 10px; }
 .registryControls, .formGrid { display: grid; gap: 10px; }
 .registryControls { grid-template-columns: 1fr 180px; margin-bottom: 10px; }
 input, select { width: 100%; min-height: 40px; margin-top: 6px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--navy); background: white; transition: border-color .14s ease, box-shadow .14s ease; }
