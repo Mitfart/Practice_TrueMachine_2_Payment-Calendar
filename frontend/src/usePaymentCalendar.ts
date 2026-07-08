@@ -3,14 +3,14 @@ import { calculateCalendar } from './calendar'
 import { money, shortDate } from './format'
 import { type Account, type CalendarDay, type CashFlow, type DirectoryItem, type FlowDraft, type PaymentStatus, type User, paymentCalendarApi } from './apiFacade'
 
-export type Page = 'calendar' | 'requests' | 'receipts' | 'approvals' | 'register' | 'reports' | 'directories' | 'admin'
+export type Page = 'calendar' | 'requests' | 'receipts' | 'approvals' | 'register' | 'reports' | 'admin'
 export type LoginState = { email: string; password: string; error: string; loading: boolean }
 export type ApprovalLog = { paymentId: string; decision: PaymentStatus; comment: string; date: string }
 
 export const statusLabel: Record<PaymentStatus, string> = { draft: 'Черновик', approval: 'На согласовании', approved: 'Согласована', 'in-register': 'В реестре', paid: 'Оплачена', rejected: 'Отклонена' }
 export const roleLabel = { initiator: 'Инициатор', treasurer: 'Казначей', manager: 'Руководитель', admin: 'Администратор' } as const
-export const pageLabel: Record<Page, string> = { calendar: 'Календарь', requests: 'Заявки', receipts: 'Поступления', approvals: 'Согласование', register: 'Реестр', reports: 'Отчёты', directories: 'Справочники', admin: 'Админ' }
-export const pageIcon: Record<Page, string> = { calendar: 'fa-calendar-days', requests: 'fa-file-invoice', receipts: 'fa-arrow-trend-up', approvals: 'fa-check-to-slot', register: 'fa-list-check', reports: 'fa-chart-line', directories: 'fa-folder-tree', admin: 'fa-gear' }
+export const pageLabel: Record<Page, string> = { calendar: 'Календарь', requests: 'Заявки', receipts: 'Поступления', approvals: 'Согласование', register: 'Реестр', reports: 'Реестр и отчёты', admin: 'Админ' }
+export const pageIcon: Record<Page, string> = { calendar: 'fa-calendar-days', requests: 'fa-file-invoice', receipts: 'fa-arrow-trend-up', approvals: 'fa-check-to-slot', register: 'fa-list-check', reports: 'fa-chart-line', admin: 'fa-gear' }
 
 const monthRange = (month: string) => {
   const [year, monthNumber] = month.split('-').map(Number)
@@ -34,9 +34,9 @@ const movableStatuses: Array<PaymentStatus | undefined> = ['draft', 'approval', 
 
 const rolePages: Record<User['role'], Page[]> = {
   initiator: ['calendar'],
-  treasurer: ['calendar', 'register', 'reports', 'directories'],
-  manager: ['calendar', 'approvals', 'register', 'reports'],
-  admin: ['calendar', 'approvals', 'register', 'reports', 'directories', 'admin'],
+  treasurer: ['calendar', 'reports'],
+  manager: ['calendar', 'approvals', 'reports'],
+  admin: ['calendar', 'approvals', 'reports', 'admin'],
 }
 
 type CalendarState = {

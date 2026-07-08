@@ -12,7 +12,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\RegistryController;
-
+use App\Http\Controllers\ReportController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -23,7 +23,7 @@ use App\Http\Controllers\RegistryController;
 // 1. ПУБЛИЧНЫЕ МАРШРУТЫ (Без токена)
 // ==========================================
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 
 // ==========================================
@@ -54,6 +54,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Счета (Accounts): обычные юзеры могут только смотреть
     Route::apiResource('accounts', AccountController::class)->only(['index', 'show']);
+    Route::middleware('role:treasurer,admin')->get('/registries/{registry}/export', [RegistryController::class, 'export']);
+    // репорт
+
+
+    Route::middleware('role:manager,treasurer,admin')->group(function () {
+        Route::get('/reports/balances', [ReportController::class, 'balances']);
+        Route::get('/reports/upcoming-gaps', [ReportController::class, 'upcomingGaps']);
+        Route::get('/reports/plan-fact', [ReportController::class, 'planFact']);
+        Route::get('/reports/balances/export', [ReportController::class, 'exportBalances']);
+    });
 
     // ==========================================
     // 3. МАРШРУТЫ АДМИНИСТРАТОРА (Ограничение по роли)

@@ -1,14 +1,18 @@
 #root { min-height: 100vh; }
-.appShell { display: grid; grid-template-columns: 76px 1fr; min-height: 100vh; background: radial-gradient(circle at top right, rgba(13,202,240,.16), transparent 34rem), var(--paper); }
-.rail { position: sticky; top: 0; height: 100vh; padding: 12px 10px; display: grid; grid-template-rows: auto 1fr auto; gap: 14px; background: #071f36; color: white; }
-.logo, .avatar { width: 48px; height: 48px; display: grid; place-items: center; border: 0; border-radius: 14px; background: #0f3456; color: white; font-weight: 900; }
-.logo { color: var(--mint); font-size: 20px; }
-.rail nav { display: grid; align-content: start; gap: 8px; }
-.rail nav button { position: relative; width: 48px; height: 48px; border: 0; border-radius: 14px; background: transparent; color: rgba(255,255,255,.66); font-size: 18px; transition: transform .14s ease, background .14s ease, color .14s ease; }
-.rail nav button.active, .rail nav button:hover { color: #071f36; background: var(--mint); }
-.rail nav button:hover { transform: translateX(2px); }
-.rail nav button span { position: absolute; left: 58px; top: 50%; transform: translateY(-50%); z-index: 1000; display: none; padding: 8px 10px; border-radius: 10px; background: #071f36; color: white; white-space: nowrap; font-size: 13px; box-shadow: 0 12px 28px rgba(0,0,0,.18); }
-.rail nav button:hover span { display: block; }
+.appShell { min-height: 100vh; background: radial-gradient(circle at top right, rgba(13,202,240,.16), transparent 34rem), var(--paper); }
+.logoMenu { position: fixed; top: 16px; right: 16px; z-index: 30; padding: 8px; border-radius: 22px; background: rgba(7,31,54,.12); backdrop-filter: blur(14px); }
+.logoTrigger, .logoMenu nav button { min-height: 54px; display: grid; place-items: center; border: 0; border-radius: 16px; background: #071f36; color: white; box-shadow: 0 12px 30px rgba(7,31,54,.18); font-weight: 950; }
+.logoTrigger { grid-template-columns: 24px 1fr; gap: 8px; width: 54px; padding: 0 15px; color: var(--mint); transition: width .18s ease; }
+.logoMenu:hover .logoTrigger, .logoMenu.open .logoTrigger, .logoMenu:focus-within .logoTrigger { width: 230px; }
+.logoTrigger i { grid-column: 1; grid-row: 1; }
+.logoTrigger span { grid-column: 2; grid-row: 1; justify-self: start; color: white; font-size: 13px; white-space: nowrap; opacity: 0; transition: opacity .12s ease; }
+.logoMenu:hover .logoTrigger span, .logoMenu.open .logoTrigger span, .logoMenu:focus-within .logoTrigger span { opacity: 1; }
+.logoMenu nav { display: none; justify-items: end; gap: 8px; padding-top: 8px; }
+.logoMenu:hover nav, .logoMenu:focus-within nav, .logoMenu.open nav { display: grid; }
+.logoMenu nav button { grid-template-columns: 1fr 24px; justify-items: start; width: 230px; padding: 0 14px; background: white; color: var(--navy); border: 1px solid var(--line); box-shadow: 0 12px 30px rgba(10,38,64,.1); }
+.logoMenu nav button i { grid-column: 2; grid-row: 1; justify-self: center; }
+.logoMenu nav button span { grid-column: 1; grid-row: 1; font-size: 13px; }
+.logoMenu nav button.active, .logoMenu nav button:hover { background: var(--mint); border-color: #31c77f; }
 .workspace { width: min(1380px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 40px; }
 .topbar, .dayTop, .modal header, .registerRow, .total, .actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .topbar { margin-bottom: 16px; }
@@ -27,13 +31,34 @@ p { color: var(--slate); }
 .kpis > div { padding: 12px; }
 .kpis span, label, small { display: block; color: var(--muted); font-size: 12px; font-weight: 850; }
 .kpis strong { display: block; margin-top: 5px; font-size: 22px; font-variant-numeric: tabular-nums; }
-.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); align-items: end; gap: 10px; padding: 10px; margin-bottom: 10px; }
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); align-items: end; gap: 10px; padding: 12px; margin-bottom: 10px; border-radius: 18px; background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(236,251,254,.9)); }
+.controls .button { min-height: 46px; }
 .accountSummary { margin-bottom: 12px; }
-.filterPopup { position: relative; }
-.filterMenu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; display: none; min-width: 280px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: var(--shadow); }
-.filterPopup:hover .filterMenu, .filterPopup:focus-within .filterMenu { display: grid; gap: 10px; }
 .registryControls, .formGrid { display: grid; gap: 10px; }
 .registryControls { grid-template-columns: 1fr 180px; margin-bottom: 10px; }
+.treasuryGrid { display: grid; grid-template-columns: minmax(280px, 420px) 1fr; gap: 12px; }
+.treasuryHero { display: grid; align-content: start; gap: 10px; background: linear-gradient(135deg, #071f36, #0f3456); color: white; }
+.treasuryHero p, .treasuryHero label, .treasuryHero .eyebrow { color: rgba(255,255,255,.74); }
+.treasuryHero input, .treasuryHero select { border-color: rgba(255,255,255,.22); }
+.treasuryHero .total { border-top: 1px solid rgba(255,255,255,.16); border-bottom: 0; }
+.floatingSummary { position: fixed; right: 16px; bottom: 16px; z-index: 25; padding: 8px; border-radius: 22px; background: rgba(7,31,54,.12); backdrop-filter: blur(14px); }
+.summaryTrigger { width: 128px; min-height: 54px; display: grid; grid-template-columns: 1fr 24px; gap: 8px; align-items: center; border: 0; border-radius: 16px; padding: 0 14px; background: #071f36; color: white; box-shadow: 0 12px 30px rgba(7,31,54,.18); font-weight: 950; }
+.summaryTrigger i { grid-column: 2; grid-row: 1; color: var(--mint); }
+.summaryTrigger span { grid-column: 1; grid-row: 1; justify-self: start; }
+.floatingSummary > section { display: none; gap: 8px; width: min(360px, calc(100vw - 48px)); padding-top: 8px; }
+.floatingSummary:hover > section, .floatingSummary:focus-within > section, .floatingSummary.open > section { display: grid; }
+.floatingSummary .kpis, .floatingSummary .accountSummary { grid-template-columns: 1fr; margin: 0; }
+.floatingSummary details { border: 1px solid var(--line); border-radius: 14px; background: white; }
+.floatingSummary summary { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; cursor: pointer; color: var(--navy); font-weight: 950; list-style: none; }
+.floatingSummary summary::-webkit-details-marker { display: none; }
+.floatingSummary details[open] { padding-bottom: 10px; }
+.miniStats, .accountMini { display: grid; gap: 6px; padding: 0 10px; }
+.miniStats span, .accountMini span { display: flex; justify-content: space-between; gap: 12px; padding: 7px 8px; border-radius: 10px; background: #f4f8fa; color: var(--slate); font-size: 12px; font-weight: 850; }
+.miniStats b, .accountMini b { color: var(--navy); font-variant-numeric: tabular-nums; }
+.toolGrid { display: grid; gap: 10px; margin-top: 10px; padding: 0 10px; }
+.toolGrid.compact { grid-template-columns: 1fr 1fr; }
+.toolGrid.compact label, .toolGrid.compact .button { min-width: 0; }
+.toolGrid.compact .button { align-self: end; }
 input, select { width: 100%; min-height: 40px; margin-top: 6px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--navy); background: white; transition: border-color .14s ease, box-shadow .14s ease; }
 input:focus, select:focus { border-color: #049cc0; outline: 0; box-shadow: 0 0 0 3px rgba(13,202,240,.18); }
 button:focus-visible, .day:focus-visible, .flowCard:focus-visible { outline: 3px solid rgba(13,202,240,.45); outline-offset: 3px; }
@@ -75,7 +100,7 @@ li.payment:active { cursor: grabbing; }
 li.income { color: #087343; background: #ecfff5; }
 .moreFlow { color: var(--muted); font-weight: 850; text-align: center; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
-.card, .panel { padding: 12px; overflow: auto; }
+.card, .panel { padding: 12px; }
 .empty { grid-column: 1 / -1; padding: 36px; text-align: center; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { padding: 11px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
@@ -90,7 +115,7 @@ tbody tr:hover { background: #f7fbfc; }
 .registerRow, .total { padding: 12px 0; border-bottom: 1px solid var(--line); }
 .total { margin-top: 8px; border: 0; font-size: 20px; }
 .modalBackdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgba(10, 38, 64, .42); animation: fadeIn .16s ease both; }
-.modal { width: min(620px, 100%); max-height: min(760px, 90vh); padding: 12px; overflow: auto; animation: popIn .18s ease both; }
+.modal { width: min(620px, 100%); max-height: min(760px, 90vh); padding: 12px; animation: popIn .18s ease both; }
 .modalDropZone { margin: 0 0 10px; padding: 10px; border-radius: 12px; border: 1px dashed #aab8bd; background: #eef2f4; color: #667b83; font-size: 13px; font-weight: 850; text-align: center; }
 .flowCard { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: white; }
 .flowCard[draggable="true"] { cursor: grab; transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease; }
@@ -105,5 +130,5 @@ tbody tr:hover { background: #f7fbfc; }
 @keyframes popIn { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: scale(1); } }
 @keyframes bob { from { transform: rotate(1deg) translateY(0); } to { transform: rotate(1deg) translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
-@media (max-width: 1000px) { .appShell { grid-template-columns: 1fr; } .rail { position: sticky; bottom: 0; top: auto; z-index: 5; height: auto; grid-template-columns: auto 1fr auto; grid-template-rows: none; } .rail nav { grid-auto-flow: column; overflow-x: auto; } .kpis, .controls { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 640px) { .workspace { width: min(100% - 20px, 1280px); } .kpis, .controls { grid-template-columns: 1fr; } .topbar { align-items: stretch; flex-direction: column; } table { min-width: 720px; } }
+@media (max-width: 1000px) { .kpis, .controls, .treasuryGrid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .logoMenu:hover nav, .floatingSummary:hover > section { display: none; } .logoMenu.open nav, .logoMenu:focus-within nav, .floatingSummary.open > section, .floatingSummary:focus-within > section { display: grid; } .workspace { width: min(100% - 20px, 1280px); padding-top: 84px; } .kpis, .controls, .treasuryGrid, .registryControls { grid-template-columns: 1fr; } .topbar { align-items: stretch; flex-direction: column; } table { min-width: 720px; } }

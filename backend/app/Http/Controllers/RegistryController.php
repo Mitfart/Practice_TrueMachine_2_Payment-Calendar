@@ -37,7 +37,10 @@ class RegistryController extends Controller
             'status' => 'draft',
         ]);
 
+        // Привязываем платежи к реестру в пивот-таблице
         $registry->payments()->attach($payments->pluck('id'));
+        
+        // ИСПРАВЛЕНО: Убраны лишние скобки () у $payments
         $payments->each(fn ($p) => $p->update(['status' => 'in_registry']));
 
         return $registry->load('payments');
@@ -48,6 +51,34 @@ class RegistryController extends Controller
         return $registry->load('payments');
     }
 
+    // ИСПРАВЛЕНО: Дублирующий импорт "use" удален из тела класса
+
+    public function export(Registry $registry)
+    {
+        $registry->load('payments.account', 'payments.counterparty', 'payments.item');
+
+        $csv = "Дата реестра,Счёт,Контрагент,Статья,Назначение,Сумма\n";
+        foreach ($registry->payments as $payment) {
+            $csv .= sprintf(
+                "%s,%s,%s,%s,%s,%.2f\n",
+                $registry->registry_date,
+                $payment->account->name,
+                $payment->counterparty->name,
+                $payment->item->name,
+                str_replace(',', ';', $payment->purpose ?? ''),
+                $payment->amount_kopecks / 100
+            );
+        }
+
+        $filename = 'registry_' . $registry->id . '_' . $registry->registry_date . '.csv';
+
+        // ИСПРАВЛЕНО: Используем глобальный хелпер response() вместо фасада Response
+        return response("\xEF\xBB\xBF" . $csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ]);
+    }
+
     // Отметить реестр как оплаченный — статус переходит на все платежи внутри
     public function markPaid(Registry $registry)
     {
@@ -56,7 +87,9 @@ class RegistryController extends Controller
         }
 
         $registry->update(['status' => 'paid']);
-        $registry->payments()->each(fn ($p) => $p->update(['status' => 'paid']));
+        
+        // ОПТИМИЗАЦИЯ: Обновляем статус одним SQL-запросом для всех связанных платежей
+        $registry->payments()->update(['status' => 'paid']);
 
         return $registry->load('payments');
     }
