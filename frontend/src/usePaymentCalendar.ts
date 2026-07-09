@@ -38,6 +38,12 @@ const rolePages: Record<User['role'], Page[]> = {
   manager: ['approvals', 'calendar', 'reports'],
   admin: ['admin'],
 }
+const roleHome: Record<User['role'], Page> = {
+  initiator: 'calendar',
+  treasurer: 'reports',
+  manager: 'approvals',
+  admin: 'admin',
+}
 
 type CalendarState = {
   page: Page
@@ -158,7 +164,7 @@ export function usePaymentCalendar(): CalendarState {
   }, [accountId, customEnd, customStart, period, periodMode, user])
 
   useEffect(() => {
-    paymentCalendarApi.restoreSession().then((nextUser) => { setUser(nextUser); setMessage(`Сессия восстановлена: ${nextUser.name}`) }).catch(() => undefined)
+    paymentCalendarApi.restoreSession().then((nextUser) => { setUser(nextUser); setPage(roleHome[nextUser.role]); setMessage(`Сессия восстановлена: ${nextUser.name}`) }).catch(() => undefined)
   }, [])
   useEffect(() => {
     const move = (event: DragEvent) => { if (draggedId) setDragPoint({ x: event.clientX, y: event.clientY }) }
@@ -174,7 +180,7 @@ export function usePaymentCalendar(): CalendarState {
     event.preventDefault()
     setLogin((state) => ({ ...state, loading: true, error: '' }))
     paymentCalendarApi.login(login.email, login.password)
-      .then((nextUser) => { setUser(nextUser); setMessage(`Вход выполнен: ${nextUser.name}`) })
+      .then((nextUser) => { setUser(nextUser); setPage(roleHome[nextUser.role]); setMessage(`Вход выполнен: ${nextUser.name}`) })
       .catch(() => setLogin((state) => ({ ...state, error: 'Не удалось войти. Проверьте логин, пароль и доступность API.' })))
       .finally(() => setLogin((state) => ({ ...state, loading: false })))
   }
@@ -201,7 +207,7 @@ export function usePaymentCalendar(): CalendarState {
   const markPaid = (ids: string[]) => Promise.all(ids.map((id) => paymentCalendarApi.setStatus(id, 'paid', 'Оплачено из реестра'))).then(() => { setMessage('Оплата отмечена'); reload() })
   const exportRegistry = (rows: CashFlow[]) => download(`registry-${new Date().toISOString().slice(0, 10)}.csv`, ['Дата;Контрагент;Сумма;Назначение', ...rows.map((f) => `${f.date};${f.counterpartyId};${money(f.amount)};${f.purpose}`)].join('\n'))
   const exportReports = () => download(`reports-${period}.csv`, ['Дата;Приход;Расход;Остаток;Разрыв', ...days.map((d) => `${d.date};${money(d.income)};${money(d.outcome)};${money(d.endBalance)};${d.hasGap ? 'да' : 'нет'}`)].join('\n'))
-  const autoLogin = (nextUser: User) => { setUser(nextUser); setMessage(`Вход выполнен: ${nextUser.name}`) }
+  const autoLogin = (nextUser: User) => { setUser(nextUser); setPage(roleHome[nextUser.role]); setMessage(`Вход выполнен: ${nextUser.name}`) }
   const logout = () => { paymentCalendarApi.logout(); setUser(null); setFlows([]); setDays([]) }
   const createUser = async (draft: { name: string; email: string; password: string; role: User['role'] }) => {
     await paymentCalendarApi.createUser(draft)

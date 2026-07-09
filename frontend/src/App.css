@@ -289,3 +289,23 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .calendar, .databaseTabs, .reportsHub > .cards { grid-template-columns: 1fr; }
   .calendar { padding-inline: 2px; }
 }
+
+/* Overflow safety for dense financial workspaces. */
+.panel, .card, .day, .treasuryGrid > *, .reportsHub > *, .adminGrid > * { min-width: 0; }
+.panel h1, .panel h2, .panel h3, .panel p, .panel span, .panel strong, .registerRow span, .databaseTable p {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.treasuryHero { overflow: hidden; padding: 20px; }
+.treasuryHero p { margin: 4px 0 8px; line-height: 1.55; }
+.treasuryHero .actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.treasuryHero .actions .button { min-width: 0; padding-inline: 8px; font-size: 12px; }
+.registryControls { grid-template-columns: minmax(0, 1fr) minmax(145px, .8fr); }
+.registerRow > * { min-width: 0; }
+.reportsHub .card { overflow: hidden; }
+@media (max-width: 1100px) {
+  .treasuryGrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .treasuryHero .actions, .registryControls { grid-template-columns: 1fr; }
+}
