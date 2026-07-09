@@ -24,6 +24,8 @@ use App\Http\Controllers\ReportController;
 // ==========================================
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/debug/users', [AuthController::class, 'debugUsers']);
+Route::post('/debug/login/{user}', [AuthController::class, 'debugLogin']);
 
 
 // ==========================================
@@ -34,6 +36,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Аутентификация сессии
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::middleware('role:manager,admin')->group(function () {
+        Route::get('/users', [AuthController::class, 'users']);
+        Route::post('/users', [AuthController::class, 'createUser']);
+    });
     
     // Основные финансовые ресурсы и календарь
     Route::get('/calendar', [CalendarController::class, 'index']);

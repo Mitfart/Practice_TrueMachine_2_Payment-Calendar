@@ -35,7 +35,7 @@ const movableStatuses: Array<PaymentStatus | undefined> = ['draft', 'approval', 
 const rolePages: Record<User['role'], Page[]> = {
   initiator: ['calendar'],
   treasurer: ['calendar', 'reports'],
-  manager: ['calendar', 'approvals', 'reports'],
+  manager: ['calendar', 'approvals', 'reports', 'admin'],
   admin: ['calendar', 'approvals', 'reports', 'admin'],
 }
 
@@ -98,6 +98,7 @@ type CalendarState = {
   markPaid: (ids: string[]) => void
   exportRegistry: (flows: CashFlow[]) => void
   exportReports: () => void
+  createUser: (draft: { name: string; email: string; password: string; role: User['role'] }) => Promise<void>
 }
 
 export function usePaymentCalendar(): CalendarState {
@@ -143,7 +144,7 @@ export function usePaymentCalendar(): CalendarState {
       paymentCalendarApi.getAccounts(),
       paymentCalendarApi.getCounterparties(),
       paymentCalendarApi.getCategories(),
-      paymentCalendarApi.getUsers(),
+      user && ['manager', 'admin'].includes(user.role) ? paymentCalendarApi.getUsers() : Promise.resolve([]),
       paymentCalendarApi.getFlows(),
     ]).then(([nextAccounts, nextCounterparties, nextCategories, nextUsers, nextFlows]) => {
       setAccounts(nextAccounts)
@@ -154,10 +155,9 @@ export function usePaymentCalendar(): CalendarState {
       setFlows(nextFlows)
       setDays(calculateCalendar(nextFlows, nextAccounts, accountId, start, end))
     })
-  }, [accountId, customEnd, customStart, period, periodMode])
+  }, [accountId, customEnd, customStart, period, periodMode, user])
 
   useEffect(() => {
-    paymentCalendarApi.getUsers().then(setUsers)
     paymentCalendarApi.restoreSession().then((nextUser) => { setUser(nextUser); setMessage(`Сессия восстановлена: ${nextUser.name}`) }).catch(() => undefined)
   }, [])
   useEffect(() => {
@@ -203,6 +203,11 @@ export function usePaymentCalendar(): CalendarState {
   const exportReports = () => download(`reports-${period}.csv`, ['Дата;Приход;Расход;Остаток;Разрыв', ...days.map((d) => `${d.date};${money(d.income)};${money(d.outcome)};${money(d.endBalance)};${d.hasGap ? 'да' : 'нет'}`)].join('\n'))
   const autoLogin = (nextUser: User) => { setUser(nextUser); setMessage(`Вход выполнен: ${nextUser.name}`) }
   const logout = () => { paymentCalendarApi.logout(); setUser(null); setFlows([]); setDays([]) }
+  const createUser = async (draft: { name: string; email: string; password: string; role: User['role'] }) => {
+    await paymentCalendarApi.createUser(draft)
+    setUsers(await paymentCalendarApi.getUsers())
+    setMessage('Пользователь создан')
+  }
 
-  return { page, setPage, accountId, setAccountId, period, setPeriod, onlyGaps, setOnlyGaps, categoryId, setCategoryId, counterpartyId, setCounterpartyId, status, setStatus, periodMode, setPeriodMode, customStart, setCustomStart, customEnd, setCustomEnd, draggedId, setDraggedId, dragPoint, setDragPoint, user, login, setLogin, users, accounts, counterparties, categories, flows, days, selectedDay, setSelectedDay, message, setMessage, availablePages, payments, receipts, visibleDays, nearestGap, monthEnd, approvedPayments, needsApproval, approvalLog, draggedFlow, reload, submitLogin, autoLogin, logout, movePayment, setPaymentStatus, createFlow, createRegistry, markPaid, exportRegistry, exportReports }
+  return { page, setPage, accountId, setAccountId, period, setPeriod, onlyGaps, setOnlyGaps, categoryId, setCategoryId, counterpartyId, setCounterpartyId, status, setStatus, periodMode, setPeriodMode, customStart, setCustomStart, customEnd, setCustomEnd, draggedId, setDraggedId, dragPoint, setDragPoint, user, login, setLogin, users, accounts, counterparties, categories, flows, days, selectedDay, setSelectedDay, message, setMessage, availablePages, payments, receipts, visibleDays, nearestGap, monthEnd, approvedPayments, needsApproval, approvalLog, draggedFlow, reload, submitLogin, autoLogin, logout, movePayment, setPaymentStatus, createFlow, createRegistry, markPaid, exportRegistry, exportReports, createUser }
 }

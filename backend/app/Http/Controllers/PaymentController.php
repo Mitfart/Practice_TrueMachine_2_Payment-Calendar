@@ -23,8 +23,8 @@ class PaymentController extends Controller
             'amount_kopecks'  => 'required|integer|min:1',
             'payment_date'    => 'required|date',
             'purpose'         => 'nullable|string|max:1000',
-            'priority'        => 'sometimes|integer',
-            'status'          => 'sometimes|string|max:50',
+            'priority'        => 'sometimes|in:low,normal,high',
+            'status'          => 'sometimes|in:draft,on_approval,approved,in_registry,paid,rejected',
         ]);
 
         // По умолчанию при создании платеж обычно получает статус draft, если не передан иной
@@ -51,8 +51,8 @@ class PaymentController extends Controller
             'amount_kopecks'  => 'sometimes|integer|min:1',
             'payment_date'    => 'sometimes|date',
             'purpose'         => 'nullable|string|max:1000',
-            'priority'        => 'sometimes|integer',
-            'status'          => 'sometimes|string|max:50',
+            'priority'        => 'sometimes|in:low,normal,high',
+            'status'          => 'sometimes|in:draft,on_approval,approved,in_registry,paid,rejected',
         ]);
 
         $payment->update($validated);
