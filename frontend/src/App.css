@@ -251,8 +251,41 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .debugUsers button small { margin-top: 2px; color: #a9bdc9; font-size: 10px; font-weight: 650; }
 .debugError { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px; border: 1px solid rgba(253,126,20,.28); border-radius: 10px; color: #ffd3ad; background: rgba(253,126,20,.1); font-size: 11px; line-height: 1.45; }
 
-/* Calendar density: never exceed four readable columns. */
-.calendar { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-@media (max-width: 1399px) { .calendar { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 1049px) { .calendar { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 679px) { .calendar { grid-template-columns: 1fr; padding-inline: 4px; } }
+/* Role workspaces and readable calendar density. */
+.calendar { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; max-width: 1440px; margin-inline: auto; }
+.day { min-height: 270px; padding: 15px; border-color: #dfe8eb; border-radius: 17px; }
+.day:hover { transform: translateY(-3px); border-color: #9fc1c9; box-shadow: 0 18px 44px rgba(10,38,64,.11); }
+.dayTop { margin: -3px -3px 5px; padding: 0 3px 11px; }
+.dayTop strong { font-size: 19px; letter-spacing: -.02em; }
+.metric { align-items: center; min-height: 29px; margin-top: 3px; padding: 0 7px; border-radius: 8px; }
+.metric:has(.positive) { background: #effbf5; }
+.metric:has(.negative) { background: #fff3f4; }
+.flowContainer { margin-top: 12px; padding: 9px; border: 0; background: #f3f7f8; }
+.day li { display: flex; align-items: center; min-height: 38px; padding: 8px 10px; font-weight: 750; }
+.reportsHub { display: grid; gap: 18px; }
+.reportsHub > .cards { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.databaseWorkspace { display: grid; gap: 16px; }
+.databaseTabs { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+.databaseTabs button { min-height: 64px; display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 14px; color: var(--slate); background: white; font-weight: 850; text-align: left; }
+.databaseTabs button i { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; color: #047b97; background: #e8f8fb; }
+.databaseTabs button b { min-width: 26px; padding: 4px 7px; border-radius: 999px; background: #eef3f5; text-align: center; }
+.databaseTabs button:hover { transform: translateY(-2px); border-color: #8fc4cf; }
+.databaseTabs button.active { border-color: #31c77f; color: var(--navy); background: #effcf5; box-shadow: 0 10px 28px rgba(32,168,104,.1); }
+.databaseForm { align-content: start; padding: 22px; }
+.databaseForm h2 { margin-bottom: 8px; }
+.databaseForm .button i { margin-right: 7px; }
+.databaseTable { padding: 0; overflow: hidden; }
+.databaseTable > header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.databaseTable > header h2 { margin: 3px 0 0; }
+.databaseTable > p { display: flex; align-items: center; gap: 11px; margin: 0; padding: 13px 20px; border-bottom: 1px solid #edf2f4; }
+.databaseTable > p:hover { padding-left: 23px; background: #f7fbfc; }
+.databaseTable > p i { color: #049cc0; }
+@media (max-width: 1199px) {
+  .calendar { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .databaseTabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .reportsHub > .cards { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 719px) {
+  .calendar, .databaseTabs, .reportsHub > .cards { grid-template-columns: 1fr; }
+  .calendar { padding-inline: 2px; }
+}

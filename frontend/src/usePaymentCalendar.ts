@@ -9,7 +9,7 @@ export type ApprovalLog = { paymentId: string; decision: PaymentStatus; comment:
 
 export const statusLabel: Record<PaymentStatus, string> = { draft: 'Черновик', approval: 'На согласовании', approved: 'Согласована', 'in-register': 'В реестре', paid: 'Оплачена', rejected: 'Отклонена' }
 export const roleLabel = { initiator: 'Инициатор', treasurer: 'Казначей', manager: 'Руководитель', admin: 'Администратор' } as const
-export const pageLabel: Record<Page, string> = { calendar: 'Календарь', requests: 'Заявки', receipts: 'Поступления', approvals: 'Согласование', register: 'Реестр', reports: 'Реестр и отчёты', admin: 'Админ' }
+export const pageLabel: Record<Page, string> = { calendar: 'Календарь', requests: 'Заявки', receipts: 'Поступления', approvals: 'Согласование', register: 'Реестр', reports: 'Казначейство и аналитика', admin: 'Управление данными' }
 export const pageIcon: Record<Page, string> = { calendar: 'fa-calendar-days', requests: 'fa-file-invoice', receipts: 'fa-arrow-trend-up', approvals: 'fa-check-to-slot', register: 'fa-list-check', reports: 'fa-chart-line', admin: 'fa-gear' }
 
 const monthRange = (month: string) => {
@@ -34,9 +34,9 @@ const movableStatuses: Array<PaymentStatus | undefined> = ['draft', 'approval', 
 
 const rolePages: Record<User['role'], Page[]> = {
   initiator: ['calendar'],
-  treasurer: ['calendar', 'reports'],
-  manager: ['calendar', 'approvals', 'reports', 'admin'],
-  admin: ['calendar', 'approvals', 'reports', 'admin'],
+  treasurer: ['reports', 'calendar'],
+  manager: ['approvals', 'calendar', 'reports'],
+  admin: ['admin'],
 }
 
 type CalendarState = {

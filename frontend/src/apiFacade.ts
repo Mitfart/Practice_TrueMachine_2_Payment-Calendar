@@ -72,6 +72,9 @@ export const paymentCalendarApi = {
   getAccounts: async () => (await api<any[]>('/accounts')).map(toAccount),
   getCounterparties: async () => (await api<any[]>('/counterparties')).map(toDirectory),
   getCategories: async () => (await api<any[]>('/items')).map(toDirectory),
+  createAccount: async (draft: { name: string; openingBalance: number }) => toAccount(await api<any>('/accounts', { method: 'POST', body: JSON.stringify({ name: draft.name, currency: 'RUB', opening_balance_kopecks: Math.round(draft.openingBalance * 100) }) })),
+  createCounterparty: async (draft: { name: string; inn: string }) => toDirectory(await api<any>('/counterparties', { method: 'POST', body: JSON.stringify(draft) })),
+  createCategory: async (draft: { name: string; type: FlowType }) => toDirectory(await api<any>('/items', { method: 'POST', body: JSON.stringify(draft) })),
   getRegisters: async () => (await api<any[]>('/registries')).map((r) => ({ id: String(r.id), date: r.registry_date, status: mapStatus(r.status) as PaymentRegister['status'], total: 0, paymentIds: (r.payments ?? []).map((p: any) => String(p.id)) })),
   getFlows: async () => {
     const [payments, incomes] = await Promise.all([api<any[]>('/payments'), api<any[]>('/incomes')])
