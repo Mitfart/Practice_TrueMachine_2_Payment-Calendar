@@ -4,7 +4,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
 ARG VITE_API_BASE_URL=/api
+ARG VITE_DEBUG_MENU=false
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_DEBUG_MENU=$VITE_DEBUG_MENU
 RUN npm run build
 
 FROM nginx:1.27-alpine

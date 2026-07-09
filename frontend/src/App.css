@@ -249,3 +249,4 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .debugUsers button i { color: var(--mint); text-align: center; }
 .debugUsers button span { font-size: 12px; font-weight: 850; }
 .debugUsers button small { margin-top: 2px; color: #a9bdc9; font-size: 10px; font-weight: 650; }
+.debugError { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px; border: 1px solid rgba(253,126,20,.28); border-radius: 10px; color: #ffd3ad; background: rgba(253,126,20,.1); font-size: 11px; line-height: 1.45; }
