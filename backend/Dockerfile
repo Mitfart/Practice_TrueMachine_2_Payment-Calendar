@@ -4,7 +4,8 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --prefer-dist --no-scripts
 
 FROM php:8.3-cli-alpine
-RUN docker-php-ext-install pdo_pgsql
+RUN apk add --no-cache postgresql-dev \
+    && docker-php-ext-install pdo_pgsql
 WORKDIR /app
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
