@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class CounterpartyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Counterparty::all();
+        return Counterparty::where('company_id', $request->user()->company_id)->get();
     }
 
     public function store(Request $request)
@@ -22,6 +22,7 @@ class CounterpartyController extends Controller
             'bank_bik' => 'nullable|string|max:9',
         ]);
 
+        $validated['company_id'] = $request->user()->company_id;
         return Counterparty::create($validated);
     }
 

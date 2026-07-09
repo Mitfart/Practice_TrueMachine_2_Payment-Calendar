@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 
 class IncomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Income::with(['account', 'counterparty', 'item'])->get();
+        return Income::with(['account', 'counterparty', 'item'])
+            ->where('company_id', $request->user()->company_id)
+            ->get();
     }
 
     public function store(Request $request)
@@ -22,6 +24,7 @@ class IncomeController extends Controller
             'income_date'     => 'required|date',
         ]);
 
+        $validated['company_id'] = $request->user()->company_id;
         $income = Income::create($validated);
         return $income->load(['account', 'counterparty', 'item']);
     }

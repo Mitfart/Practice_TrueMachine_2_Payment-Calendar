@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Подгружаем связи и историю согласований, чтобы избежать проблемы N+1
-        return Payment::with(['account', 'counterparty', 'item', 'approvals'])->get();
+        return Payment::with(['account', 'counterparty', 'item', 'approvals'])
+            ->where('company_id', $request->user()->company_id)
+            ->get();
     }
 
     public function store(Request $request)
@@ -32,6 +34,7 @@ class PaymentController extends Controller
             $validated['status'] = 'draft';
         }
 
+        $validated['company_id'] = $request->user()->company_id;
         $payment = Payment::create($validated);
         
         return $payment->load(['account', 'counterparty', 'item', 'approvals']);

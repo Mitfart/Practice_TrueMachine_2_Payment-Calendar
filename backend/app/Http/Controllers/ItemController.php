@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Item::all();
+        return Item::where('company_id', $request->user()->company_id)->get();
     }
 
     public function store(Request $request)
@@ -19,6 +19,7 @@ class ItemController extends Controller
             'type' => 'required|string|max:50', // Например: 'product' или 'service'
         ]);
 
+        $validated['company_id'] = $request->user()->company_id;
         return Item::create($validated);
     }
 

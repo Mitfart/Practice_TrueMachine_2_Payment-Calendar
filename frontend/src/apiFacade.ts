@@ -41,7 +41,7 @@ const api = async <T,>(path: string, init: RequestInit = {}) => {
 }
 const mapStatus = (status?: string): PaymentStatus => status === 'on_approval' ? 'approval' : status === 'in_registry' ? 'in-register' : (status as PaymentStatus) || 'draft'
 const toAccount = (row: any): Account => ({ id: String(row.id), name: row.name, currency: row.currency ?? 'RUB', openingBalance: (row.opening_balance_kopecks ?? 0) / 100 })
-const toDirectory = (row: any): DirectoryItem => ({ id: String(row.id), name: row.name, type: row.type === 'income' ? 'income' : row.type === 'payment' ? 'payment' : undefined, details: row.inn ?? row.details ?? '' })
+const toDirectory = (row: any): DirectoryItem => ({ id: String(row.id), name: row.name, type: row.type === 'income' ? 'income' : ['payment', 'expense'].includes(row.type) ? 'payment' : undefined, details: row.inn ?? row.details ?? '' })
 const toPayment = (row: any): CashFlow => ({ id: String(row.id), type: 'payment', date: row.payment_date, accountId: String(row.account_id), counterpartyId: String(row.counterparty_id), categoryId: String(row.item_id), purpose: row.purpose ?? '', amount: row.amount_kopecks / 100, status: mapStatus(row.status), priority: ['low', 'normal', 'high'].includes(row.priority) ? row.priority : 'normal' })
 const toIncome = (row: any): CashFlow => ({ id: `i-${row.id}`, type: 'income', date: row.income_date, accountId: String(row.account_id), counterpartyId: String(row.counterparty_id), categoryId: String(row.item_id), purpose: 'Плановое поступление', amount: row.amount_kopecks / 100 })
 export const paymentCalendarApi = {
@@ -74,7 +74,7 @@ export const paymentCalendarApi = {
   getCategories: async () => (await api<any[]>('/items')).map(toDirectory),
   createAccount: async (draft: { name: string; openingBalance: number }) => toAccount(await api<any>('/accounts', { method: 'POST', body: JSON.stringify({ name: draft.name, currency: 'RUB', opening_balance_kopecks: Math.round(draft.openingBalance * 100) }) })),
   createCounterparty: async (draft: { name: string; inn: string }) => toDirectory(await api<any>('/counterparties', { method: 'POST', body: JSON.stringify(draft) })),
-  createCategory: async (draft: { name: string; type: FlowType }) => toDirectory(await api<any>('/items', { method: 'POST', body: JSON.stringify(draft) })),
+  createCategory: async (draft: { name: string; type: FlowType }) => toDirectory(await api<any>('/items', { method: 'POST', body: JSON.stringify({ ...draft, type: draft.type === 'payment' ? 'expense' : 'income' }) })),
   getRegisters: async () => (await api<any[]>('/registries')).map((r) => ({ id: String(r.id), date: r.registry_date, status: mapStatus(r.status) as PaymentRegister['status'], total: 0, paymentIds: (r.payments ?? []).map((p: any) => String(p.id)) })),
   getFlows: async () => {
     const [payments, incomes] = await Promise.all([api<any[]>('/payments'), api<any[]>('/incomes')])

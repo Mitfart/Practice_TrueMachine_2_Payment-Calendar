@@ -19,6 +19,7 @@ class Counterparty extends Model
         'inn', 
         'kpp', 
         'bank_account', 
-        'bank_bik'
+        'bank_bik',
+        'company_id',
     ];
 }

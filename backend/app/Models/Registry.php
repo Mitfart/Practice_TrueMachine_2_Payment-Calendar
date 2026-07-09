@@ -20,7 +20,8 @@ class Registry extends Model
         'account_id', 
         'created_by', 
         'registry_date', 
-        'status'
+        'status',
+        'company_id',
     ];
 
     /**

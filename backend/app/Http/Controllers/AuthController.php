@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,7 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'admin',
+            'company_id' => Company::firstOrCreate(['code' => 'DEMO'], ['name' => 'DEMO'])->id,
         ]);
 
         $token = $user->createToken('api-token')->plainTextToken;
@@ -38,7 +40,10 @@ class AuthController extends Controller
 
     public function users()
     {
-        return User::query()->orderBy('name')->get();
+        return User::query()
+            ->where('company_id', request()->user()->company_id)
+            ->orderBy('name')
+            ->get();
     }
 
     public function createUser(Request $request)
@@ -54,6 +59,7 @@ class AuthController extends Controller
             'role' => ['required', Rule::in($allowedRoles)],
         ]);
 
+        $validated['company_id'] = $request->user()->company_id;
         return response()->json(User::create($validated), 201);
     }
 

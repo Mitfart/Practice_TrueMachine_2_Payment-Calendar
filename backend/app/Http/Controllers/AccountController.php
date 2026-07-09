@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class AccountController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Account::all();
+        return Account::where('company_id', $request->user()->company_id)->get();
     }
 
     public function store(Request $request)
@@ -20,6 +20,7 @@ class AccountController extends Controller
             'opening_balance_kopecks' => 'required|integer',
         ]);
 
+        $validated['company_id'] = $request->user()->company_id;
         return Account::create($validated);
     }
 

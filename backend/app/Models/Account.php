@@ -17,6 +17,7 @@ class Account extends Model
     protected $fillable = [
         'name', 
         'currency', 
-        'opening_balance_kopecks'
+        'opening_balance_kopecks',
+        'company_id',
     ];
 }

@@ -11,7 +11,8 @@
 - Docker startup idempotently creates the single administrator.
 - Debug startup also creates one user for each non-admin role.
 - After bootstrap, only managers/admins create users; managers cannot grant privileged roles.
-- Seeders intentionally create no users or business data.
+- Demo mode uses a real `DEMO` company tenant. Users, dictionaries, movements, and registers carry `company_id`.
+- The idempotent debug seed contains 4 users, 3 accounts, 6 counterparties, 7 categories, 7 payments, and 4 incomes for June 2026.
 - Roles: `initiator`, `treasurer`, `manager`, `admin` via `CheckRole` middleware.
 - Dictionaries: accounts, counterparties, items.
 - Money: `amount_kopecks` / `opening_balance_kopecks` integers. Keep it that way; no floats except CSV display formatting.

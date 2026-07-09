@@ -25,9 +25,9 @@ class CalendarController extends Controller
         $from = Carbon::parse($validated['from'])->startOfDay();
         $to = Carbon::parse($validated['to'])->startOfDay();
 
-        $accounts = $request->filled('account_id')
-            ? Account::where('id', $validated['account_id'])->get()
-            : Account::all();
+        $accounts = Account::where('company_id', $request->user()->company_id)
+            ->when($request->filled('account_id'), fn ($query) => $query->where('id', $validated['account_id']))
+            ->get();
 
         $result = [];
 

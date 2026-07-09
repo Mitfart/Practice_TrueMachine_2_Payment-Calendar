@@ -21,6 +21,7 @@ class Income extends Model
         'item_id',
         'amount_kopecks', 
         'income_date',
+        'company_id',
     ];
 
     /**

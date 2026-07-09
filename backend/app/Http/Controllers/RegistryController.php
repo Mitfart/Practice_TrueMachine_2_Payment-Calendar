@@ -8,9 +8,11 @@ use Illuminate\Http\Request;
 
 class RegistryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Registry::with('payments')->get();
+        return Registry::with('payments')
+            ->where('company_id', $request->user()->company_id)
+            ->get();
     }
 
     // Формирование реестра из согласованных заявок за дату
@@ -22,6 +24,7 @@ class RegistryController extends Controller
         ]);
 
         $payments = Payment::where('account_id', $validated['account_id'])
+            ->where('company_id', $request->user()->company_id)
             ->where('status', 'approved')
             ->whereDate('payment_date', $validated['registry_date'])
             ->get();
@@ -35,6 +38,7 @@ class RegistryController extends Controller
             'created_by' => $request->user()->id,
             'registry_date' => $validated['registry_date'],
             'status' => 'draft',
+            'company_id' => $request->user()->company_id,
         ]);
 
         // Привязываем платежи к реестру в пивот-таблице

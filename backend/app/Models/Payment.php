@@ -25,6 +25,7 @@ class Payment extends Model
         'purpose', 
         'priority', 
         'status',
+        'company_id',
     ];
 
     /**
