@@ -1,44 +1,144 @@
-# Practice TrueMachine 2: Payment Calendar
-
-Laravel 12 + React 19 base setup for the payment-calendar technical specification.
-
-- Backend: `backend/`
-- Frontend: `frontend/`
-- Spec: `docs/technical-specification.md`
-- Agent/DOX contract: `AGENTS.md`
-
-## Run
-
-```bash
-cd frontend
-npm run dev
-```
-
-Backend needs local PHP + Composer:
-
-```bash
-cd backend
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan serve
-```
 # Payment Calendar
 
-Start the complete application:
+Payment planning application built with Laravel, React, TypeScript, PostgreSQL, and Docker.
 
-```bash
+## Recommended startup
+
+Requirements:
+
+- Docker Desktop
+- Docker Compose
+
+From the project root:
+
+```powershell
 docker compose up --build
 ```
 
-Open `http://localhost:8080`.
+Open:
 
-Docker startup creates the single administrator automatically:
+```text
+http://localhost:8080
+```
 
-- Email: `admin@payment-calendar.local`
-- Password: value of `BOOTSTRAP_USER_PASSWORD`
+Docker starts three services:
 
-In debug mode it also creates one initiator, treasurer, and manager for the
-debug login menu. The default local password is `Chicken_Road_K10_28`.
-Additional users are created from the Admin page. A second administrator
-cannot be created through the API.
+- React frontend with Nginx
+- Laravel API
+- PostgreSQL database
+
+Database migrations and demonstration data are applied automatically.
+
+## Demo accounts
+
+The debug login menu is located in the bottom-left corner of the login page.
+It contains one user for every role.
+
+| Role | Email |
+|---|---|
+| Administrator | `admin@payment-calendar.local` |
+| Manager | `manager@payment-calendar.local` |
+| Treasurer | `treasurer@payment-calendar.local` |
+| Initiator | `initiator@payment-calendar.local` |
+
+Default password for every demo user:
+
+```text
+Chicken_Road_K10_28
+```
+
+All demonstration users and financial data belong to the `DEMO` company.
+The administrator is created automatically and only one administrator is
+allowed.
+
+## Useful Docker commands
+
+Start in the background:
+
+```powershell
+docker compose up --build -d
+```
+
+View service status:
+
+```powershell
+docker compose ps
+```
+
+View backend logs:
+
+```powershell
+docker compose logs backend --tail 100
+```
+
+Stop the application:
+
+```powershell
+docker compose down
+```
+
+Delete the database and start from a clean state:
+
+```powershell
+docker compose down -v
+docker compose up --build
+```
+
+## Local frontend development
+
+Requirements:
+
+- Node.js 22+
+- Backend running at `http://127.0.0.1:8000`
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Vite proxies `/api` requests to the local Laravel backend.
+
+## Local backend development
+
+Requirements:
+
+- PHP 8.4+
+- Composer
+- PostgreSQL
+
+```powershell
+cd backend
+Copy-Item .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+Configure PostgreSQL credentials and `APP_DEBUG=true` in `backend/.env`
+before running migrations.
+
+## Verification
+
+Frontend:
+
+```powershell
+cd frontend
+npm run build
+npm run lint
+```
+
+Backend:
+
+```powershell
+cd backend
+php artisan test
+```
+
+## Project structure
+
+- `backend/` — Laravel API, database migrations, and seed data
+- `frontend/` — React and TypeScript client
+- `docs/technical-specification.md` — product technical specification
+- `docker-compose.yml` — complete Docker environment
