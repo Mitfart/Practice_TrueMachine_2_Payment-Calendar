@@ -33,14 +33,12 @@ docker compose up --build
 
 Open `http://localhost:8080`.
 
-The database starts empty. Create the first administrator once:
+Docker startup creates the single administrator automatically:
 
-```bash
-curl -X POST http://localhost:8080/api/register \
-  -H "Content-Type: application/json" \
-  -d "{\"name\":\"Administrator\",\"email\":\"admin@example.com\",\"password\":\"change-me-now\"}"
-```
+- Email: `admin@payment-calendar.local`
+- Password: value of `BOOTSTRAP_USER_PASSWORD`
 
-The bootstrap endpoint closes after the first user is created. Managers and
-administrators can then add users from the Admin page. Managers cannot grant
-manager or administrator roles.
+In debug mode it also creates one initiator, treasurer, and manager for the
+debug login menu. The default local password is `Chicken_Road_K10_28`.
+Additional users are created from the Admin page. A second administrator
+cannot be created through the API.

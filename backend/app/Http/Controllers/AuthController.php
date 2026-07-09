@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -12,7 +13,7 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        if (User::query()->exists()) {
+        if (User::query()->where('role', 'admin')->exists()) {
             abort(403, 'Первый администратор уже создан.');
         }
 
@@ -43,7 +44,7 @@ class AuthController extends Controller
     public function createUser(Request $request)
     {
         $allowedRoles = $request->user()->role === 'admin'
-            ? ['initiator', 'treasurer', 'manager', 'admin']
+            ? ['initiator', 'treasurer', 'manager']
             : ['initiator', 'treasurer'];
 
         $validated = $request->validate([
@@ -80,11 +81,17 @@ class AuthController extends Controller
     {
         abort_unless(config('app.debug'), 404);
 
-        return User::query()
+        $users = DB::table('users')
+            ->select(['id', 'name', 'email', 'role'])
+            ->whereIn('id', function ($query) {
+                $query->from('users')
+                    ->selectRaw('MIN(id)')
+                    ->groupBy('role');
+            })
             ->orderBy('id')
-            ->get()
-            ->unique('role')
-            ->values();
+            ->get();
+
+        return response()->json($users);
     }
 
     public function debugLogin(User $user)

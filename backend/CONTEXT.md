@@ -8,7 +8,8 @@
 ## Current implementation map
 
 - Auth: Sanctum token login/register/logout/me.
-- Empty installations allow one public bootstrap registration, always as admin.
+- Docker startup idempotently creates the single administrator.
+- Debug startup also creates one user for each non-admin role.
 - After bootstrap, only managers/admins create users; managers cannot grant privileged roles.
 - Seeders intentionally create no users or business data.
 - Roles: `initiator`, `treasurer`, `manager`, `admin` via `CheckRole` middleware.

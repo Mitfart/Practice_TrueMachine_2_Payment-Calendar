@@ -30,6 +30,8 @@ services:
       SESSION_DRIVER: database
       CACHE_STORE: database
       QUEUE_CONNECTION: database
+      BOOTSTRAP_ADMIN_EMAIL: admin@payment-calendar.local
+      BOOTSTRAP_USER_PASSWORD: Chicken_Road_K10_28
     depends_on:
       database:
         condition: service_healthy
