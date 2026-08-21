@@ -5,6 +5,7 @@ import { load, save } from './storage'
 let store = load()
 
 const uid = () => Math.random().toString(36).slice(2, 10)
+const TOKEN_KEY = 'payment-calendar-token'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mutate(fn: (s: typeof store) => any) {
@@ -17,30 +18,36 @@ export const localApi = {
   apiBase: '/',
   isBackendOnline: () => true,
 
-  login: async (_email: string, _password: string) => {
-    // Auto-login as first demo user
-    const user = store.users[0]
-    localStorage.setItem('payment-calendar-token', 'local-demo')
+  login: async (email: string, password: string) => {
+    const user = store.users.find((u) => u.email === email)
+    if (!user || store.passwords[user.id] !== password) {
+      throw new Error('Неверный email или пароль')
+    }
+    localStorage.setItem(TOKEN_KEY, user.id)
     return user
   },
 
   logout: async () => {
-    localStorage.removeItem('payment-calendar-token')
+    localStorage.removeItem(TOKEN_KEY)
     return true
   },
 
   restoreSession: async () => {
-    const token = localStorage.getItem('payment-calendar-token')
-    if (!token) throw new Error('No session')
-    return store.users[0]
+    const userId = localStorage.getItem(TOKEN_KEY)
+    if (!userId) throw new Error('No session')
+    const user = store.users.find((u) => u.id === userId)
+    if (!user) throw new Error('User not found')
+    return user
   },
 
   getUsers: async () => store.users,
 
   createUser: async (draft: { name: string; email: string; password: string; role: User['role'] }) =>
     mutate((s) => {
-      const user: User = { id: uid(), name: draft.name, role: draft.role, email: draft.email }
+      const id = uid()
+      const user: User = { id, name: draft.name, role: draft.role, email: draft.email }
       s.users = [...s.users, user]
+      s.passwords = { ...s.passwords, [id]: draft.password }
       return user
     }),
 
@@ -49,7 +56,7 @@ export const localApi = {
   debugLogin: async (userId: string) => {
     const user = store.users.find((u) => u.id === userId)
     if (!user) throw new Error('User not found')
-    localStorage.setItem('payment-calendar-token', 'local-debug')
+    localStorage.setItem(TOKEN_KEY, user.id)
     return user
   },
 

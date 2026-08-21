@@ -4,6 +4,7 @@ const KEY = 'pc-data'
 
 interface Store {
   users: User[]
+  passwords: Record<string, string>
   accounts: Account[]
   counterparties: DirectoryItem[]
   categories: DirectoryItem[]
@@ -14,9 +15,17 @@ interface Store {
 
 const seed = (): Store => ({
   users: [
-    { id: '1', name: 'Демо Казначей', role: 'treasurer', email: 'demo@demo.ru' },
-    { id: '2', name: 'Демо Инициатор', role: 'initiator', email: 'init@demo.ru' },
+    { id: '1', name: 'Демо Казначей', role: 'treasurer', email: 'treasurer@demo.ru' },
+    { id: '2', name: 'Демо Инициатор', role: 'initiator', email: 'initiator@demo.ru' },
+    { id: '3', name: 'Демо Руководитель', role: 'manager', email: 'manager@demo.ru' },
+    { id: '4', name: 'Демо Администратор', role: 'admin', email: 'admin@demo.ru' },
   ],
+  passwords: {
+    '1': '123',
+    '2': '123',
+    '3': '123',
+    '4': '123',
+  },
   accounts: [
     { id: '1', name: 'Основной счёт', currency: 'RUB', openingBalance: 1_000_000 },
     { id: '2', name: 'Резервный счёт', currency: 'RUB', openingBalance: 500_000 },
@@ -61,4 +70,14 @@ export function load(): Store {
 
 export function save(store: Store) {
   localStorage.setItem(KEY, JSON.stringify(store))
+}
+
+/** Dev tool: get all demo credentials for debug menu */
+export function getDemoCredentials(): { email: string; password: string; role: string }[] {
+  const s = load()
+  return s.users.map((u) => ({
+    email: u.email ?? '',
+    password: s.passwords[u.id] ?? '',
+    role: u.role,
+  }))
 }
