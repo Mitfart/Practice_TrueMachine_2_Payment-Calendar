@@ -1,4 +1,5 @@
 import { calculateCalendar } from './calendar'
+import { localApi } from './apiLocal'
 
 export type UserRole = 'initiator' | 'treasurer' | 'manager' | 'admin'
 export type PaymentStatus = 'draft' | 'approval' | 'approved' | 'in-register' | 'paid' | 'rejected'
@@ -44,7 +45,7 @@ const toAccount = (row: any): Account => ({ id: String(row.id), name: row.name, 
 const toDirectory = (row: any): DirectoryItem => ({ id: String(row.id), name: row.name, type: row.type === 'income' ? 'income' : ['payment', 'expense'].includes(row.type) ? 'payment' : undefined, details: row.inn ?? row.details ?? '' })
 const toPayment = (row: any): CashFlow => ({ id: String(row.id), type: 'payment', date: row.payment_date, accountId: String(row.account_id), counterpartyId: String(row.counterparty_id), categoryId: String(row.item_id), purpose: row.purpose ?? '', amount: row.amount_kopecks / 100, status: mapStatus(row.status), priority: ['low', 'normal', 'high'].includes(row.priority) ? row.priority : 'normal' })
 const toIncome = (row: any): CashFlow => ({ id: `i-${row.id}`, type: 'income', date: row.income_date, accountId: String(row.account_id), counterpartyId: String(row.counterparty_id), categoryId: String(row.item_id), purpose: 'Плановое поступление', amount: row.amount_kopecks / 100 })
-export const paymentCalendarApi = {
+const _remoteApi = {
   apiBase: API_BASE,
   isBackendOnline: () => backendOnline,
   login: async (email: string, password: string) => {
@@ -114,3 +115,8 @@ export const paymentCalendarApi = {
   },
   getCalendar: async (start = '2026-06-01', end = '2026-06-30', accountId = 'all') => calculateCalendar(await paymentCalendarApi.getFlows(), await paymentCalendarApi.getAccounts(), accountId, start, end),
 }
+
+
+
+const _isLocal = (import.meta.env.VITE_STORAGE_MODE as string) === 'local'
+export const paymentCalendarApi = _isLocal ? localApi : (_remoteApi as typeof _remoteApi)
