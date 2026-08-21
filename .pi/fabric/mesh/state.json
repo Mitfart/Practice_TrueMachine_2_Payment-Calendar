@@ -14,11 +14,11 @@
           "sessionId": "01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb"
         },
         "startedAt": 1787334782957,
-        "updatedAt": 1787337759322,
-        "expiresAt": 1787337774322
+        "updatedAt": 1787347819152,
+        "expiresAt": 1787347834152
       },
-      "version": 640,
-      "updatedAt": 1787337759345,
+      "version": 2698,
+      "updatedAt": 1787347819165,
       "updatedBy": {
         "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
         "name": "main",
@@ -40,12 +40,12 @@
         "model": "omni/auto",
         "thinking": "off",
         "startedAt": 1787334782944,
-        "updatedAt": 1787337759322,
+        "updatedAt": 1787347819152,
         "pendingMessages": false,
         "local": false
       },
-      "version": 640,
-      "updatedAt": 1787337759369,
+      "version": 2698,
+      "updatedAt": 1787347819187,
       "updatedBy": {
         "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
         "name": "main",
@@ -76,12 +76,12 @@
         "model": "omni/auto",
         "thinking": "off",
         "startedAt": 1787334782944,
-        "updatedAt": 1787337759322,
+        "updatedAt": 1787347819152,
         "pendingMessages": false,
         "controlProtocol": "v1"
       },
-      "version": 640,
-      "updatedAt": 1787337759388,
+      "version": 2698,
+      "updatedAt": 1787347819207,
       "updatedBy": {
         "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
         "name": "main",
@@ -91,9 +91,9 @@
     }
   },
   "versions": {
-    "topology/hosts/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": 640,
-    "sessions/01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb": 640,
-    "topology/participants/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": 640
+    "topology/hosts/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": 2698,
+    "sessions/01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb": 2698,
+    "topology/participants/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": 2698
   },
   "tombstoneOrder": []
 }

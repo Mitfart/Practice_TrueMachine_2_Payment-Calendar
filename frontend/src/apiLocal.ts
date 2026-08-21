@@ -19,7 +19,7 @@ export const localApi = {
   isBackendOnline: () => true,
 
   login: async (email: string, password: string) => {
-    const user = store.users.find((u) => u.email === email)
+    const user = store.users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
     if (!user || store.passwords[user.id] !== password) {
       throw new Error('Неверный email или пароль')
     }
