@@ -1,67 +1,67 @@
 {
   "format": 1,
   "entries": {
-    "topology/hosts/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": {
-      "key": "topology/hosts/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d",
+    "topology/hosts/6c9724fb7ad7bcef2c77b95c4a15289066a4b71e3e4b8ddde30776374ecc2af4": {
+      "key": "topology/hosts/6c9724fb7ad7bcef2c77b95c4a15289066a4b71e3e4b8ddde30776374ecc2af4",
       "value": {
         "format": 1,
-        "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
-        "rootId": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+        "id": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
+        "rootId": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
         "identity": {
-          "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+          "id": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
           "name": "main",
           "kind": "main",
-          "sessionId": "01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb"
+          "sessionId": "01a02688-e548-7ece-8272-61cf1a0fd421"
         },
-        "startedAt": 1787334782957,
-        "updatedAt": 1787347819152,
-        "expiresAt": 1787347834152
+        "startedAt": 1787380556870,
+        "updatedAt": 1787401274123,
+        "expiresAt": 1787401289123
       },
-      "version": 2698,
-      "updatedAt": 1787347819165,
+      "version": 4139,
+      "updatedAt": 1787401274145,
       "updatedBy": {
-        "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+        "id": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
         "name": "main",
         "kind": "main",
-        "sessionId": "01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb"
+        "sessionId": "01a02688-e548-7ece-8272-61cf1a0fd421"
       }
     },
-    "sessions/01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb": {
-      "key": "sessions/01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+    "sessions/01a02688-e548-7ece-8272-61cf1a0fd421": {
+      "key": "sessions/01a02688-e548-7ece-8272-61cf1a0fd421",
       "value": {
-        "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
-        "name": "Peer 01a0256e",
+        "id": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
+        "name": "Peer 01a02688",
         "kind": "peer",
         "status": "idle",
         "runner": "pi",
         "transport": "host",
         "cwd": "D:\\Work\\Cocos\\Practice_TrueMachine_2_Payment-Calendar",
-        "sessionId": "01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+        "sessionId": "01a02688-e548-7ece-8272-61cf1a0fd421",
         "model": "omni/auto",
         "thinking": "off",
-        "startedAt": 1787334782944,
-        "updatedAt": 1787347819152,
+        "startedAt": 1787380556866,
+        "updatedAt": 1787401274123,
         "pendingMessages": false,
         "local": false
       },
-      "version": 2698,
-      "updatedAt": 1787347819187,
+      "version": 4139,
+      "updatedAt": 1787401274164,
       "updatedBy": {
-        "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+        "id": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
         "name": "main",
         "kind": "main",
-        "sessionId": "01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb"
+        "sessionId": "01a02688-e548-7ece-8272-61cf1a0fd421"
       }
     },
-    "topology/participants/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": {
-      "key": "topology/participants/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d",
+    "topology/participants/6c9724fb7ad7bcef2c77b95c4a15289066a4b71e3e4b8ddde30776374ecc2af4": {
+      "key": "topology/participants/6c9724fb7ad7bcef2c77b95c4a15289066a4b71e3e4b8ddde30776374ecc2af4",
       "value": {
         "format": 1,
-        "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+        "id": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
         "kind": "root",
-        "rootId": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
-        "ownerHostId": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
-        "ownerIdentityId": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+        "rootId": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
+        "ownerHostId": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
+        "ownerIdentityId": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
         "name": "main",
         "status": "idle",
         "runner": "pi",
@@ -72,28 +72,35 @@
           "fabric"
         ],
         "cwd": "D:\\Work\\Cocos\\Practice_TrueMachine_2_Payment-Calendar",
-        "sessionId": "01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+        "sessionId": "01a02688-e548-7ece-8272-61cf1a0fd421",
         "model": "omni/auto",
         "thinking": "off",
-        "startedAt": 1787334782944,
-        "updatedAt": 1787347819152,
+        "startedAt": 1787380556866,
+        "updatedAt": 1787401274123,
         "pendingMessages": false,
         "controlProtocol": "v1"
       },
-      "version": 2698,
-      "updatedAt": 1787347819207,
+      "version": 4139,
+      "updatedAt": 1787401274184,
       "updatedBy": {
-        "id": "session:01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+        "id": "session:01a02688-e548-7ece-8272-61cf1a0fd421",
         "name": "main",
         "kind": "main",
-        "sessionId": "01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb"
+        "sessionId": "01a02688-e548-7ece-8272-61cf1a0fd421"
       }
     }
   },
   "versions": {
-    "topology/hosts/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": 2698,
-    "sessions/01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb": 2698,
-    "topology/participants/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": 2698
+    "topology/hosts/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": 3711,
+    "sessions/01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb": 3710,
+    "topology/participants/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d": 3711,
+    "topology/hosts/6c9724fb7ad7bcef2c77b95c4a15289066a4b71e3e4b8ddde30776374ecc2af4": 4139,
+    "sessions/01a02688-e548-7ece-8272-61cf1a0fd421": 4139,
+    "topology/participants/6c9724fb7ad7bcef2c77b95c4a15289066a4b71e3e4b8ddde30776374ecc2af4": 4139
   },
-  "tombstoneOrder": []
+  "tombstoneOrder": [
+    "sessions/01a0256e-a82e-78d4-9f2f-8b0ab8bc08fb",
+    "topology/participants/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d",
+    "topology/hosts/4ecc1867e5d6400756f73bcfbb658ba7c81b331c510ca56e95477786fb67b03d"
+  ]
 }

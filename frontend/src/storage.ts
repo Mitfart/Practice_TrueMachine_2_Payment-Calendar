@@ -3,6 +3,7 @@ import type { User, Account, DirectoryItem, CashFlow, PaymentRegister } from './
 const KEY = 'pc-data'
 
 interface Store {
+  _v: number
   users: User[]
   passwords: Record<string, string>
   accounts: Account[]
@@ -13,7 +14,10 @@ interface Store {
   registries: PaymentRegister[]
 }
 
+const CURRENT_VERSION = 1
+
 const seed = (): Store => ({
+  _v: CURRENT_VERSION,
   users: [
     { id: '1', name: 'Демо Казначей', role: 'treasurer', email: 'treasurer@demo.ru' },
     { id: '2', name: 'Демо Инициатор', role: 'initiator', email: 'initiator@demo.ru' },
@@ -61,7 +65,10 @@ const seed = (): Store => ({
 export function load(): Store {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) {
+      const data = JSON.parse(raw)
+      if (data._v === CURRENT_VERSION) return data
+    }
   } catch { /* corrupt data, re-seed */ }
   const data = seed()
   save(data)
