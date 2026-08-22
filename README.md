@@ -1,5 +1,29 @@
 # Payment Calendar
 
+
+## Preview
+
+Live demo: https://mitfart.github.io/Practice_TrueMachine_2_Payment-Calendar/
+
+## Gallery
+
+<table>
+<tr>
+  <td><img src="images/0_login.png" width="280" alt="Login" /></td>
+  <td><img src="images/1_calendar.png" width="280" alt="Calendar" /></td>
+  <td><img src="images/2_calendar_settings.png" width="280" alt="Calendar Settings" /></td>
+</tr>
+<tr>
+  <td><img src="images/3_treasurer.png" width="280" alt="Treasurer" /></td>
+  <td><img src="images/4_confirmation.png" width="280" alt="Confirmation" /></td>
+  <td><img src="images/5_admin_users.png" width="280" alt="Admin Users" /></td>
+</tr>
+<tr>
+  <td><img src="images/6_admin_bank_accounts.png" width="280" alt="Admin Bank Accounts" /></td>
+  <td><img src="images/7_admin_counterparties.png" width="280" alt="Admin Counterparties" /></td>
+  <td><img src="images/8_admin_cost_items.png" width="280" alt="Admin Cost Items" /></td>
+</tr>
+</table>
 Payment planning application built with Laravel, React, TypeScript, PostgreSQL, and Docker.
 
 ## Recommended startup
@@ -142,3 +166,7 @@ php artisan test
 - `frontend/` — React and TypeScript client
 - `docs/technical-specification.md` — product technical specification
 - `docker-compose.yml` — complete Docker environment
+
+
+
+
